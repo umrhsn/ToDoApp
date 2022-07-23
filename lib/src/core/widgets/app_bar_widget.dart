@@ -5,11 +5,11 @@ import 'package:to_do_app/src/core/utils/app_strings.dart';
 class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
   bool hasLeadingIcon;
   final IconData? leadingIcon;
-  Function? leadingIconOnTap;
+  void Function()? leadingIconOnTap;
   final String title;
   bool hasActions;
   final IconData? trailingIcon;
-  Function? trailingIconOnTap;
+  void Function()? trailingIconOnTap;
   TabBar? bottom;
   double toolbarHeight;
 
@@ -31,9 +31,7 @@ class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
     return AppBar(
       leading: hasLeadingIcon
           ? InkWell(
-              onTap: () {
-                leadingIconOnTap;
-              },
+              onTap: leadingIconOnTap,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10.w),
                 child: IconButton(
@@ -49,7 +47,7 @@ class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10.w),
                 child: IconButton(
-                  onPressed: () {},
+                  onPressed: trailingIconOnTap,
                   icon: Icon(trailingIcon),
                 ),
               )

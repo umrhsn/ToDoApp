@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:to_do_app/src/config/routes/app_routes.dart';
 import 'package:to_do_app/src/core/utils/app_colors.dart';
 
 class AllTabBarView extends StatefulWidget {
@@ -26,7 +27,7 @@ class _AllTabBarViewState extends State<AllTabBarView> {
           child: MaterialButton(
             minWidth: double.infinity,
             padding: const EdgeInsets.all(20),
-            onPressed: () {},
+            onPressed: () => Navigator.pushNamed(context, Routes.addTaskRoute),
             color: AppColors.primary,
             textColor: Colors.white,
             elevation: 0,

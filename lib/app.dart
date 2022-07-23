@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_app/src/config/routes/app_routes.dart';
 import 'package:to_do_app/src/config/themes/app_theme.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,8 +17,9 @@ class ToDoApp extends StatelessWidget {
           themeMode: ThemeMode.system,
           theme: AppThemes.appTheme(isLight: true),
           darkTheme: AppThemes.appTheme(isLight: false),
-          home: const BoardScreen(),
           debugShowCheckedModeBanner: false,
+          initialRoute: Routes.initialRoute,
+          onGenerateRoute: AppRoutes.onGenerateRoute,
         );
       },
     );
