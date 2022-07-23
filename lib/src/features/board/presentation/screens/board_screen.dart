@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
+import 'package:to_do_app/src/core/widgets/app_bar_widget.dart';
 import 'package:to_do_app/src/features/board/presentation/widgets/board_content.dart';
 
 class BoardScreen extends StatefulWidget {
@@ -14,13 +15,27 @@ class _BoardScreenState extends State<BoardScreen> {
     return const BoardContent();
   }
 
-  final appBar = AppBar(title: const Text(AppStrings.appName));
+  final appBar = AppBarWidget(
+      title: AppStrings.boardScreenTitle,
+      hasActions: true,
+      trailingIcon: Icons.calendar_month_outlined,
+      bottom: const TabBar(
+        tabs: [
+          Tab(text: 'All'),
+          Tab(text: 'Completed'),
+          Tab(text: 'Uncompleted'),
+          Tab(text: 'Favorite'),
+        ],
+      ));
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: appBar,
-      body: _buildBodyContent(),
+    return DefaultTabController(
+      length: 4,
+      child: Scaffold(
+        appBar: appBar,
+        body: _buildBodyContent(),
+      ),
     );
   }
 }

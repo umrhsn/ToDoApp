@@ -5,6 +5,13 @@ class BoardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Board Screen'));
+    return const TabBarView(
+      children: [
+        Text('All'),
+        Text('Completed'),
+        Text('Uncompleted'),
+        Text('Favorite'),
+      ],
+    );
   }
 }
