@@ -7,10 +7,10 @@ class BoardContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return const TabBarView(
       children: [
-        Text('All'),
-        Text('Completed'),
-        Text('Uncompleted'),
-        Text('Favorite'),
+        Center(child: Text('All')),
+        Center(child: Text('Completed')),
+        Center(child: Text('Uncompleted')),
+        Center(child: Text('Favorite')),
       ],
     );
   }

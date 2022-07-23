@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:to_do_app/src/core/utils/app_constants.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
 import 'package:to_do_app/src/core/widgets/app_bar_widget.dart';
 import 'package:to_do_app/src/features/board/presentation/widgets/board_content.dart';
@@ -16,17 +18,12 @@ class _BoardScreenState extends State<BoardScreen> {
   }
 
   final appBar = AppBarWidget(
-      title: AppStrings.boardScreenTitle,
-      hasActions: true,
-      trailingIcon: Icons.calendar_month_outlined,
-      bottom: const TabBar(
-        tabs: [
-          Tab(text: 'All'),
-          Tab(text: 'Completed'),
-          Tab(text: 'Uncompleted'),
-          Tab(text: 'Favorite'),
-        ],
-      ));
+    toolbarHeight: 80.h,
+    title: AppStrings.boardScreenTitle,
+    hasActions: true,
+    trailingIcon: Icons.calendar_month_outlined,
+    bottom: const TabBar(tabs: AppConstants.boardTabsList),
+  );
 
   @override
   Widget build(BuildContext context) {

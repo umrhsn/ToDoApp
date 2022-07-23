@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:to_do_app/src/core/utils/app_strings.dart';
 
 class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
   bool hasLeadingIcon;
@@ -10,6 +11,7 @@ class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
   final IconData? trailingIcon;
   Function? trailingIconOnTap;
   TabBar? bottom;
+  double toolbarHeight;
 
   AppBarWidget({
     Key? key,
@@ -21,6 +23,7 @@ class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
     this.trailingIcon,
     this.trailingIconOnTap,
     this.bottom,
+    this.toolbarHeight = kToolbarHeight,
   }) : super(key: key);
 
   @override
@@ -57,5 +60,5 @@ class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(80.h);
+  Size get preferredSize => Size.fromHeight(toolbarHeight);
 }
