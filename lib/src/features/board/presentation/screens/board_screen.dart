@@ -14,7 +14,7 @@ class BoardScreen extends StatefulWidget {
 
 class _BoardScreenState extends State<BoardScreen> {
   Widget _buildBodyContent() {
-    return const BoardContent();
+    return BoardContent();
   }
 
   final appBar = AppBarWidget(
