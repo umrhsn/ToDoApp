@@ -22,13 +22,13 @@ class _BoardScreenState extends State<BoardScreen> {
     title: AppStrings.boardScreenTitle,
     hasActions: true,
     trailingIcon: Icons.calendar_month_outlined,
-    bottom: const TabBar(tabs: AppConstants.boardTabsList),
+    bottom: const TabBar(tabs: AppConstants.boardTabs),
   );
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: AppConstants.boardTabViews.length,
       child: Scaffold(
         appBar: appBar,
         body: _buildBodyContent(),
