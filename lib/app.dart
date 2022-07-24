@@ -17,7 +17,7 @@ class ToDoApp extends StatelessWidget {
           theme: AppThemes.appTheme(isLight: true),
           darkTheme: AppThemes.appTheme(isLight: false),
           debugShowCheckedModeBanner: false,
-          initialRoute: Routes.initialRoute,
+          initialRoute: Routes.addTaskRoute,
           onGenerateRoute: AppRoutes.onGenerateRoute,
         );
       },

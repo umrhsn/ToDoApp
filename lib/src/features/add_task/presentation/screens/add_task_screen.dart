@@ -12,7 +12,7 @@ class AddTaskScreen extends StatefulWidget {
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
   Widget _buildBodyContent() {
-    return const AddTaskContent();
+    return const Padding(padding: EdgeInsets.all(20), child: AddTaskContent());
   }
 
   @override
