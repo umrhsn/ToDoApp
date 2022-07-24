@@ -3,7 +3,6 @@ import 'package:to_do_app/src/config/routes/app_routes.dart';
 import 'package:to_do_app/src/config/themes/app_theme.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:to_do_app/src/features/board/presentation/screens/board_screen.dart';
 
 class ToDoApp extends StatelessWidget {
   const ToDoApp({Key? key}) : super(key: key);

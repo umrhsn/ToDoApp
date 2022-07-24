@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
+import 'package:to_do_app/src/core/widgets/app_bar_widget.dart';
 import 'package:to_do_app/src/features/add_task/presentation/widgets/add_task_content.dart';
 
 class AddTaskScreen extends StatefulWidget {
@@ -14,12 +15,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     return const AddTaskContent();
   }
 
-  final appBar = AppBar(title: const Text(AppStrings.appName));
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar,
+      appBar: AppBarWidget(
+          leadingIcon: Icons.arrow_back,
+          leadingIconOnTap: () => Navigator.pop(context),
+          title: AppStrings.addTaskScreenTitle),
       body: _buildBodyContent(),
     );
   }

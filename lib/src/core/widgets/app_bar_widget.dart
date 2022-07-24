@@ -23,7 +23,7 @@ class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
     this.trailingIcon,
     this.trailingIconOnTap,
     this.bottom,
-    this.toolbarHeight = kToolbarHeight,
+    this.toolbarHeight = 65,
   }) : super(key: key);
 
   @override

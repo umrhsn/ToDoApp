@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
+import 'package:to_do_app/src/core/widgets/app_bar_widget.dart';
 import 'package:to_do_app/src/features/schedule/presentation/widgets/schedule_content.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -14,12 +15,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     return const ScheduleContent();
   }
 
-  final appBar = AppBar(title: const Text(AppStrings.appName));
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar,
+      appBar: AppBarWidget(
+          leadingIcon: Icons.arrow_back,
+          leadingIconOnTap: () => Navigator.pop(context),
+          title: AppStrings.scheduleScreenTitle),
       body: _buildBodyContent(),
     );
   }
