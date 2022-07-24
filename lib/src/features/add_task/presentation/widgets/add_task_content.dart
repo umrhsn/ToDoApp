@@ -16,12 +16,6 @@ class AddTaskContent extends StatelessWidget {
     final endTimeController = TextEditingController();
     final remindController = TextEditingController();
     final repeatController = TextEditingController();
-    final titleFocusNode = FocusNode();
-    final dateFocusNode = FocusNode();
-    final startTimeFocusNode = FocusNode();
-    final endTimeFocusNode = FocusNode();
-    final remindFocusNode = FocusNode();
-    final repeatFocusNode = FocusNode();
 
     return SingleChildScrollView(
       child: Column(
@@ -100,7 +94,9 @@ class AddTaskContent extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 116.h),
+          SizedBox(
+              height: 116
+                  .h), // FIXME: due to having a SingleChildScrollView, the Column's MainAxisAlignment.spaceBetween is ineffective, so temporarily I put SizedBox(height: 116.h)
           MyButtonWidget(
               onPressed: () {
                 // TODO: implement creating a task function
