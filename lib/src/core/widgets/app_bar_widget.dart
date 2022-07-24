@@ -10,7 +10,7 @@ class AppBarWidget extends StatelessWidget with PreferredSizeWidget {
   bool hasActions;
   final IconData? trailingIcon;
   void Function()? trailingIconOnTap;
-  TabBar? bottom;
+  PreferredSizeWidget? bottom;
   double toolbarHeight;
 
   AppBarWidget({

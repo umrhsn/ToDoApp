@@ -21,17 +21,17 @@ class _BoardScreenState extends State<BoardScreen> {
   @override
   Widget build(BuildContext context) {
     final appBar = AppBarWidget(
-      toolbarHeight: 80.h,
+      toolbarHeight: 100,
       title: AppStrings.boardScreenTitle,
       hasActions: true,
       trailingIcon: Icons.calendar_month_outlined,
       trailingIconOnTap: () =>
           Navigator.pushNamed(context, Routes.scheduleRoute),
-      bottom: const TabBar(tabs: AppConstants.boardTabs),
+      bottom: const TabBar(tabs: AppConstants.boardTabs, isScrollable: true),
     );
 
     return DefaultTabController(
-      length: AppConstants.boardTabViews.length,
+      length: AppConstants.boardTabViewsList.length,
       child: Scaffold(
         appBar: appBar,
         body: _buildBodyContent(),

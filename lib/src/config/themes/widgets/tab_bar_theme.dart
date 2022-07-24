@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:to_do_app/src/core/utils/app_colors.dart';
 
 class TabBarThemes {
   static TabBarTheme tabBarTheme({required bool isLight}) {
@@ -15,6 +14,7 @@ class TabBarThemes {
         // borderRadius: BorderRadius.circular(10),
       ),
       labelColor: isLight ? Colors.black : Colors.white,
+      unselectedLabelColor: Colors.grey,
       indicatorSize: TabBarIndicatorSize.label,
     );
   }

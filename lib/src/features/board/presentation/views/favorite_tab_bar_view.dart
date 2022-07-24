@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_app/src/features/board/presentation/widgets/tab_view_widget.dart';
 
 class FavoriteTabBarView extends StatefulWidget {
   const FavoriteTabBarView({Key? key}) : super(key: key);
@@ -10,6 +11,6 @@ class FavoriteTabBarView extends StatefulWidget {
 class _FavoriteTabBarViewState extends State<FavoriteTabBarView> {
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Favorite'));
+    return const MyTabView();
   }
 }

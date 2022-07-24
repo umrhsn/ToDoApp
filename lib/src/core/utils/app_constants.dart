@@ -12,10 +12,10 @@ class AppConstants {
     Tab(text: 'Favorite'),
   ];
 
-  static const List<Widget> boardTabViews = [
-    Padding(padding: EdgeInsets.all(20), child: AllTabBarView()),
-    Padding(padding: EdgeInsets.all(20), child: CompletedTabBarView()),
-    Padding(padding: EdgeInsets.all(20), child: UncompletedTabBarView()),
-    Padding(padding: EdgeInsets.all(20), child: FavoriteTabBarView()),
+  static const List<Widget> boardTabViewsList = [
+    AllTabBarView(),
+    CompletedTabBarView(),
+    UncompletedTabBarView(),
+    FavoriteTabBarView(),
   ];
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_app/src/features/board/presentation/widgets/tab_view_widget.dart';
 
 class CompletedTabBarView extends StatefulWidget {
   const CompletedTabBarView({Key? key}) : super(key: key);
@@ -10,6 +11,6 @@ class CompletedTabBarView extends StatefulWidget {
 class _CompletedTabBarViewState extends State<CompletedTabBarView> {
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Completed'));
+    return const MyTabView();
   }
 }
