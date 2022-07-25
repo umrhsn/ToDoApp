@@ -18,4 +18,15 @@ class AppConstants {
     UncompletedTabBarView(),
     FavoriteTabBarView(),
   ];
+
+  static List<PopupMenuEntry<String>> menuItems = {
+    'Add to Completed',
+    'Add to Uncompleted',
+    'Add to Favorites',
+  }.map((String choice) {
+    return PopupMenuItem<String>(
+      value: choice,
+      child: Text(choice),
+    );
+  }).toList();
 }
