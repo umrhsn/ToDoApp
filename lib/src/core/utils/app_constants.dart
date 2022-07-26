@@ -19,7 +19,7 @@ class AppConstants {
     FavoriteTabBarView(),
   ];
 
-  static List<PopupMenuEntry<String>> menuItems = {
+  static List<PopupMenuEntry<String>> boardMenuItems = {
     'Add to Completed',
     'Add to Uncompleted',
     'Add to Favorites',

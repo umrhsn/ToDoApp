@@ -12,11 +12,14 @@ class AppThemes {
         brightness: isLight ? Brightness.light : Brightness.dark,
         appBarTheme: AppBarThemes.appBarTheme(isLight: isLight),
         tabBarTheme: TabBarThemes.tabBarTheme(isLight: isLight),
-        primaryColor: AppColors.primary,
-        primarySwatch: AppColors.primarySwatch,
+        primaryColor: isLight ? AppColors.primaryLight : AppColors.primaryDark,
+        primarySwatch: isLight
+            ? AppColors.primarySwatchLight
+            : AppColors.primarySwatchDark,
         scaffoldBackgroundColor: isLight ? Colors.white : Colors.black,
         fontFamily: AppStrings.fontFamily,
         textTheme: AppTextThemes.textTheme(isLight: isLight),
-        inputDecorationTheme: AppTextFieldThemes.inputDecorationTheme());
+        inputDecorationTheme:
+            AppTextFieldThemes.inputDecorationTheme(isLight: isLight));
   }
 }

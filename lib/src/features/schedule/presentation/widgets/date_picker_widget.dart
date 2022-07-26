@@ -32,7 +32,8 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
         height: 80,
         initialSelectedDate: widget.initialSelectedDate,
         // TODO: make it the date of the first task added
-        selectionColor: AppColors.primary,
+        selectionColor:
+            isLight ? AppColors.primaryLight : AppColors.primaryDark,
         selectedTextColor: Colors.white,
         dayTextStyle: TextStyle(fontSize: 10, color: textColor),
         monthTextStyle: TextStyle(fontSize: 10, color: textColor),

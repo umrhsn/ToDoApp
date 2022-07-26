@@ -36,7 +36,7 @@ class BoardItem extends StatelessWidget {
         PopupMenuButton<String>(
           onSelected: _handleClick,
           itemBuilder: (context) {
-            return AppConstants.menuItems;
+            return AppConstants.boardMenuItems;
           },
         ),
       ],
