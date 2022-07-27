@@ -2,24 +2,26 @@ import 'package:flutter/material.dart';
 
 class TextFormFieldWidget extends StatelessWidget {
   final TextEditingController controller;
-  final bool? enabled;
+  final bool readOnly;
   final FocusNode? focusNode;
   final TextInputAction textInputAction;
   final TextInputType keyboardType;
   final String label;
   final String hintText;
   final IconData? suffixIcon;
-  final void Function()? suffixIconOnTap;
+  void Function()? suffixIconOnTap;
+  void Function(TapDownDetails)? suffixIconOnTapDown;
   final void Function()? onEditingComplete;
 
-  const TextFormFieldWidget({
+  TextFormFieldWidget({
     Key? key,
-    this.enabled = false,
+    this.readOnly = true,
     required this.controller,
     required this.label,
     required this.hintText,
     this.suffixIcon,
     this.suffixIconOnTap,
+    this.suffixIconOnTapDown,
     this.focusNode,
     required this.keyboardType,
     this.onEditingComplete,
@@ -37,14 +39,17 @@ class TextFormFieldWidget extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         TextFormField(
-          enabled: enabled,
+          enabled: true,
+          readOnly: readOnly,
           controller: controller,
           textInputAction: textInputAction,
           keyboardType: keyboardType,
           decoration: InputDecoration(
               hintText: hintText,
-              suffixIcon:
-                  InkWell(onTap: suffixIconOnTap, child: Icon(suffixIcon))),
+              suffixIcon: GestureDetector(
+                  onTapDown: suffixIconOnTapDown,
+                  onTap: suffixIconOnTap,
+                  child: Icon(suffixIcon))),
           onEditingComplete: onEditingComplete,
         ),
       ],

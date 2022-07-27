@@ -17,10 +17,13 @@ class AppStrings {
   static const String createTaskButtonLabel = 'Create a task';
 
   /// TextFormField labels
-  static String titleTextFormFieldLabel = 'Title';
-  static String dateTextFormFieldLabel = 'Date';
-  static String startTimeTextFormFieldLabel = 'Start time';
-  static String endTimeTextFormFieldLabel = 'End time';
-  static String remindTextFormFieldLabel = 'Reminder';
-  static String repeatTextFormFieldLabel = 'Repeat';
+  static String titleTextFieldLabel = 'Title';
+  static String dateTextFieldLabel = 'Date';
+  static String startTimeTextFieldLabel = 'Start time';
+  static String endTimeTextFieldLabel = 'End time';
+  static String remindTextFieldLabel = 'Reminder';
+  static String repeatTextFieldLabel = 'Repeat';
+
+  /// date
+  static String dateNow = DateTime.now().toString().substring(0, 10);
 }
