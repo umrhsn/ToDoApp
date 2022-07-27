@@ -26,4 +26,13 @@ class AppStrings {
 
   /// date
   static String dateNow = DateTime.now().toString().substring(0, 10);
+
+  /// lists
+  static List<String> repeatList = ['None', 'Daily', 'Weekly', 'Monthly'];
+  static List<String> reminderList = [
+    '10 min before',
+    '30 min before',
+    '1 hour before',
+    '1 day before',
+  ];
 }

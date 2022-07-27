@@ -11,7 +11,7 @@ class ScheduleContent extends StatefulWidget {
 }
 
 class _ScheduleContentState extends State<ScheduleContent> {
-  DateTime _selectedValue = DateTime.now();
+  final DateTime _selectedDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class _ScheduleContentState extends State<ScheduleContent> {
       children: [
         DatePickerWidget(
             startDate: DateTime.now(),
-            selectedValue: _selectedValue,
+            selectedDate: _selectedDate,
             initialSelectedDate: DateTime.now()),
         const Divider(thickness: 2),
         Padding(
@@ -35,15 +35,9 @@ class _ScheduleContentState extends State<ScheduleContent> {
             ],
           ),
         ),
-        Expanded(
-          child: Padding(
-            padding:
-                const EdgeInsets.only(bottom: 20, right: 20, left: 20, top: 8),
-            child: ListView.builder(
-                itemBuilder: (context, index) => const ScheduleItem(),
-                itemCount: 100),
-          ),
-        ),
+        Padding(
+            padding: EdgeInsets.only(bottom: 20, right: 20, left: 20, top: 8),
+            child: Wrap(children: List.generate(4, (index) => ScheduleItem()))),
       ],
     );
   }

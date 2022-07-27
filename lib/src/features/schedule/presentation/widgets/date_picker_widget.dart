@@ -7,12 +7,12 @@ class DatePickerWidget extends StatefulWidget {
   DatePickerWidget({
     Key? key,
     required this.startDate,
-    required this.selectedValue,
+    required this.selectedDate,
     required this.initialSelectedDate,
   }) : super(key: key);
 
   DateTime startDate;
-  DateTime selectedValue;
+  DateTime selectedDate;
   DateTime initialSelectedDate;
 
   @override
@@ -41,7 +41,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
         onDateChange: (date) {
           // New date selected
           setState(() {
-            widget.selectedValue = date;
+            widget.selectedDate = date;
           });
         },
       ),

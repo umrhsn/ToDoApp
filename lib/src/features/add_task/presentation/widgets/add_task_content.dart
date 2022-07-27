@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:to_do_app/db_cubit.dart';
+import 'package:to_do_app/db_state.dart';
 import 'package:to_do_app/src/config/routes/app_routes.dart';
+import 'package:to_do_app/src/core/utils/app_colors.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
 import 'package:to_do_app/src/core/widgets/my_button_widget.dart';
 import 'package:to_do_app/src/core/widgets/text_field_widget.dart';
@@ -14,12 +19,7 @@ class AddTaskContent extends StatefulWidget {
 
 class _AddTaskContentState extends State<AddTaskContent> {
   final formKey = GlobalKey<FormState>();
-  final titleController = TextEditingController();
-  final dateController = TextEditingController();
-  final startTimeController = TextEditingController();
-  final endTimeController = TextEditingController();
-  final remindController = TextEditingController();
-  final repeatController = TextEditingController();
+
   DateTime dateTime = DateTime(
     DateTime.now().year,
     DateTime.now().month,
@@ -28,35 +28,108 @@ class _AddTaskContentState extends State<AddTaskContent> {
     DateTime.now().minute,
   );
 
+  String _selectedRepeat = 'None';
+  int _selectedColor = 0;
+
   @override
   Widget build(BuildContext context) {
+    final titleController = DatabaseCubit.get(context).titleController;
+    final dateController = DatabaseCubit.get(context).dateController;
+    final startTimeController = DatabaseCubit.get(context).startTimeController;
+    final endTimeController = DatabaseCubit.get(context).endTimeController;
+    final remindController = DatabaseCubit.get(context).remindController;
+    final repeatController = DatabaseCubit.get(context).repeatController;
+
+    Future<DateTime?> _getDateFromUser() async {
+      return await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime.now(),
+          lastDate: DateTime(2100));
+    }
+
+    Future<TimeOfDay?> _getTimeFromUser() async => await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay(hour: dateTime.hour, minute: dateTime.minute),
+        );
+
+    void _setDateText() async {
+      final date = await _getDateFromUser();
+
+      if (date == null) return; // pressed cancel
+
+      setState(() {
+        dateTime = date;
+        dateController.text =
+            '${dateTime.year}-${dateTime.month}-${dateTime.day}';
+      });
+    }
+
+    void _setStartTimeText(String hour, String minute) async {
+      final time = await _getTimeFromUser();
+
+      if (time == null) return; // pressed cancel
+
+      final newDateTime = DateTime(
+        dateTime.year,
+        dateTime.month,
+        dateTime.day,
+        time.hour,
+        time.minute,
+      );
+
+      setState(() {
+        dateTime = newDateTime;
+        startTimeController.text = '$hour : $minute';
+      });
+    }
+
+    void _setEndTimeText(String hour, String minute) async {
+      final time = await _getTimeFromUser();
+
+      if (time == null) return; // pressed cancel
+
+      final newDateTime = DateTime(
+        dateTime.year,
+        dateTime.month,
+        dateTime.day,
+        time.hour,
+        time.minute,
+      );
+
+      setState(() {
+        dateTime = newDateTime;
+        endTimeController.text = '$hour : $minute';
+      });
+    }
+
     List<PopupMenuItem> addTaskReminderMenuItems = [
       PopupMenuItem(
         value: 1,
-        child: Text('10 min before'),
+        child: Text(AppStrings.reminderList[0]),
         onTap: () {
-          remindController.text = '10 min before';
+          remindController.text = AppStrings.reminderList[0];
         },
       ),
       PopupMenuItem(
         value: 2,
-        child: Text('30 min before'),
+        child: Text(AppStrings.reminderList[1]),
         onTap: () {
-          remindController.text = '30 min before';
+          remindController.text = AppStrings.reminderList[1];
         },
       ),
       PopupMenuItem(
         value: 3,
-        child: Text('1 hour before'),
+        child: Text(AppStrings.reminderList[2]),
         onTap: () {
-          remindController.text = '1 hour before';
+          remindController.text = AppStrings.reminderList[2];
         },
       ),
       PopupMenuItem(
         value: 4,
-        child: Text('1 day before'),
+        child: Text(AppStrings.reminderList[3]),
         onTap: () {
-          remindController.text = '1 day before';
+          remindController.text = AppStrings.reminderList[3];
         },
       ),
     ];
@@ -64,16 +137,30 @@ class _AddTaskContentState extends State<AddTaskContent> {
     List<PopupMenuItem> addTaskRepeatMenuItems = [
       PopupMenuItem(
         value: 1,
-        child: Text('Weekly'),
+        child: Text(AppStrings.repeatList[0]),
         onTap: () {
-          repeatController.text = 'Weekly';
+          repeatController.text = AppStrings.repeatList[0];
         },
       ),
       PopupMenuItem(
         value: 2,
-        child: Text('Daily'),
+        child: Text(AppStrings.repeatList[1]),
         onTap: () {
-          repeatController.text = 'Daily';
+          repeatController.text = AppStrings.repeatList[1];
+        },
+      ),
+      PopupMenuItem(
+        value: 2,
+        child: Text(AppStrings.repeatList[2]),
+        onTap: () {
+          repeatController.text = AppStrings.repeatList[2];
+        },
+      ),
+      PopupMenuItem(
+        value: 2,
+        child: Text(AppStrings.repeatList[3]),
+        onTap: () {
+          repeatController.text = AppStrings.repeatList[3];
         },
       ),
     ];
@@ -86,6 +173,7 @@ class _AddTaskContentState extends State<AddTaskContent> {
     return SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Form(
             key: formKey,
@@ -96,8 +184,7 @@ class _AddTaskContentState extends State<AddTaskContent> {
                   controller: titleController,
                   label: AppStrings.titleTextFieldLabel,
                   hintText: 'Design team meeting',
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
+                  suffixIcon: null,
                 ),
                 const SizedBox(height: 25),
                 TextFormFieldWidget(
@@ -105,10 +192,8 @@ class _AddTaskContentState extends State<AddTaskContent> {
                   label: AppStrings.dateTextFieldLabel,
                   hintText:
                       '${dateTime.year}-${dateTime.month}-${dateTime.day}',
-                  suffixIcon: Icons.keyboard_arrow_down_rounded,
                   suffixIconOnTap: _setDateText,
                   keyboardType: TextInputType.datetime,
-                  textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 25),
                 Row(
@@ -122,7 +207,6 @@ class _AddTaskContentState extends State<AddTaskContent> {
                         suffixIcon: Icons.access_time_rounded,
                         suffixIconOnTap: () => _setStartTimeText(hour, minute),
                         keyboardType: TextInputType.datetime,
-                        textInputAction: TextInputAction.next,
                       ),
                     ),
                     const SizedBox(width: 20),
@@ -134,44 +218,75 @@ class _AddTaskContentState extends State<AddTaskContent> {
                         suffixIcon: Icons.access_time_rounded,
                         suffixIconOnTap: () => _setEndTimeText(hour, minute),
                         keyboardType: TextInputType.datetime,
-                        textInputAction: TextInputAction.next,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 25),
                 TextFormFieldWidget(
-                  textInputAction: TextInputAction.next,
                   controller: remindController,
                   label: AppStrings.remindTextFieldLabel,
                   hintText: '10 minutes early',
-                  suffixIcon: Icons.keyboard_arrow_down_rounded,
                   suffixIconOnTapDown: (details) => _showPopupMenuAtPosition(
                       details, addTaskReminderMenuItems),
-                  keyboardType: TextInputType.text,
                 ),
                 const SizedBox(height: 25),
                 TextFormFieldWidget(
-                  textInputAction: TextInputAction.done,
                   controller: repeatController,
                   label: AppStrings.repeatTextFieldLabel,
                   hintText: 'Weekly',
-                  suffixIcon: Icons.keyboard_arrow_down_rounded,
                   suffixIconOnTapDown: (details) =>
                       _showPopupMenuAtPosition(details, addTaskRepeatMenuItems),
-                  keyboardType: TextInputType.text,
                 ),
               ],
             ),
           ),
-          SizedBox(height: 116.h),
-          // FIXME: due to having a SingleChildScrollView, the Column's MainAxisAlignment.spaceBetween is not effective, so temporarily I put SizedBox(height: 116.h)
-          MyButtonWidget(
-              onPressed: () {
-                // TODO: create task in database
-                Navigator.pushNamed(context, Routes.initialRoute);
-              },
-              label: AppStrings.createTaskButtonLabel),
+          const SizedBox(height: 25),
+          // TODO: make reusable component named ColorPickerWidget
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Color',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              Wrap(
+                children: List<Widget>.generate(4, (index) {
+                  return GestureDetector(
+                    onTap: () => setState(() => _selectedColor = index),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: CircleAvatar(
+                        radius: 14,
+                        backgroundColor: index == 0
+                            ? AppColors.tasksColorsList[0]
+                            : index == 1
+                                ? AppColors.tasksColorsList[1]
+                                : index == 2
+                                    ? AppColors.tasksColorsList[2]
+                                    : AppColors.tasksColorsList[3],
+                        child: _selectedColor == index
+                            ? const Icon(Icons.done,
+                                color: Colors.white, size: 16)
+                            : Container(),
+                      ),
+                    ),
+                  );
+                }),
+              )
+            ],
+          ),
+          SizedBox(height: 53.h),
+          // FIXME: due to having a SingleChildScrollView, the Column's MainAxisAlignment.spaceBetween is not effective
+          BlocBuilder<DatabaseCubit, DatabaseState>(
+            builder: (BuildContext context, state) {
+              return MyButtonWidget(
+                  onPressed: () {
+                    DatabaseCubit.get(context).createTask();
+                    Navigator.pushNamed(context, Routes.initialRoute);
+                  },
+                  label: AppStrings.createTaskButtonLabel);
+            },
+          ),
         ],
       ),
     );
@@ -190,67 +305,4 @@ class _AddTaskContentState extends State<AddTaskContent> {
         position: RelativeRect.fromLTRB(offset.dx, offset.dy, 0, 0),
         items: menuItems);
   }
-
-  void _setDateText() async {
-    final date = await _pickDate();
-
-    if (date == null) return; // pressed cancel
-
-    setState(() {
-      dateTime = date;
-      dateController.text =
-          '${dateTime.year}-${dateTime.month}-${dateTime.day}';
-    });
-  }
-
-  void _setStartTimeText(String hour, String minute) async {
-    final time = await _pickTime();
-
-    if (time == null) return; // pressed cancel
-
-    final newDateTime = DateTime(
-      dateTime.year,
-      dateTime.month,
-      dateTime.day,
-      time.hour,
-      time.minute,
-    );
-
-    setState(() {
-      dateTime = newDateTime;
-      startTimeController.text = '$hour : $minute';
-    });
-  }
-
-  void _setEndTimeText(String hour, String minute) async {
-    final time = await _pickTime();
-
-    if (time == null) return; // pressed cancel
-
-    final newDateTime = DateTime(
-      dateTime.year,
-      dateTime.month,
-      dateTime.day,
-      time.hour,
-      time.minute,
-    );
-
-    setState(() {
-      dateTime = newDateTime;
-      endTimeController.text = '$hour : $minute';
-    });
-  }
-
-  Future<DateTime?> _pickDate() async {
-    return await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2100));
-  }
-
-  Future<TimeOfDay?> _pickTime() async => await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay(hour: dateTime.hour, minute: dateTime.minute),
-      );
 }

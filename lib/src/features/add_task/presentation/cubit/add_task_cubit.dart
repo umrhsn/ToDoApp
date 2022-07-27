@@ -3,6 +3,6 @@ import 'package:equatable/equatable.dart';
 
 part 'add_task_state.dart';
 
-class AddTaskCubit extends Cubit<AddTaskState> {
-  AddTaskCubit() : super(AddTaskInitial());
+class AddTaskCubit extends Cubit<int> {
+  AddTaskCubit() : super(0);
 }

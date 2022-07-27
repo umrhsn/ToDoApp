@@ -19,13 +19,13 @@ class TextFormFieldWidget extends StatelessWidget {
     required this.controller,
     required this.label,
     required this.hintText,
-    this.suffixIcon,
+    this.suffixIcon = Icons.keyboard_arrow_down_rounded,
     this.suffixIconOnTap,
     this.suffixIconOnTapDown,
     this.focusNode,
-    required this.keyboardType,
+    this.keyboardType = TextInputType.text,
     this.onEditingComplete,
-    required this.textInputAction,
+    this.textInputAction = TextInputAction.next,
   }) : super(key: key);
 
   @override

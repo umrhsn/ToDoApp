@@ -8,7 +8,7 @@ class ScheduleItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppColors.tasksColorsList.shuffle();
+    // AppColors.tasksColorsList.shuffle();
     bool isChecked = false;
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
