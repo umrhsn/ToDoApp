@@ -16,3 +16,5 @@ class DatabaseLoading extends DatabaseState {}
 class DatabaseTasksFetched extends DatabaseState {}
 
 class DatabaseTaskCreated extends DatabaseState {}
+
+class DatabaseTaskUpdated extends DatabaseState {}

@@ -18,6 +18,28 @@ class _BoardContentState extends State<BoardContent>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  Widget _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      switch (_tabController.index) {
+        case 0:
+          DatabaseCubit.get(context).getAllTasks();
+          return AppConstants.boardTabViewsList[0];
+        case 1:
+          DatabaseCubit.get(context).getCompletedTasks();
+          return AppConstants.boardTabViewsList[1];
+        case 2:
+          DatabaseCubit.get(context).getUnCompletedTasks();
+          return AppConstants.boardTabViewsList[2];
+        case 3:
+          DatabaseCubit.get(context).getFavoriteTasks();
+          return AppConstants.boardTabViewsList[3];
+        default:
+          return const Text('no tasks found');
+      }
+    }
+    return const Text('no tasks found');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -27,7 +49,7 @@ class _BoardContentState extends State<BoardContent>
         initialIndex: 0);
     _tabController.addListener(() {
       // TODO: implement handle tabs method responding to sql database
-      // _handleTabsSelection();
+      _handleTabSelection();
     });
   }
 
@@ -38,13 +60,9 @@ class _BoardContentState extends State<BoardContent>
       child: Column(
         children: [
           Expanded(
-            child: BlocBuilder<DatabaseCubit, DatabaseState>(
-              builder: (context, state) {
-                return TabBarView(
-                    controller: _tabController,
-                    children: AppConstants.boardTabViewsList);
-              },
-            ),
+            child: TabBarView(
+                controller: _tabController,
+                children: AppConstants.boardTabViewsList),
           ),
           MyButtonWidget(
             label: AppStrings.addTaskButtonLabel,
@@ -54,20 +72,4 @@ class _BoardContentState extends State<BoardContent>
       ),
     );
   }
-
-//   void _handleTabSelection() {
-//     if (_tabController.indexIsChanging) {
-//       switch (_tabController.index) {
-//         case 0:
-//           filterData('all');
-//           break;
-//         case 1:
-//           filterData('experienceConsulting');
-//           break;
-//         case 2:
-//           filterData('frontOfficeTransformation');
-//           break;
-//       }
-//     }
-//   }
 }

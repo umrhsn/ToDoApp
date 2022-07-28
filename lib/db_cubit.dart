@@ -52,12 +52,12 @@ class DatabaseCubit extends Cubit<DatabaseState> {
       onOpen: (Database db) {
         debugPrint('DatabaseOpened');
         database = db;
-        getTasksData();
+        getAllTasks();
       },
     );
   }
 
-  void getTasksData() async {
+  void getAllTasks() async {
     emit(DatabaseLoading());
     database.rawQuery('SELECT * FROM tasks').then((value) {
       debugPrint('Tasks Data Fetched');
@@ -120,29 +120,24 @@ class DatabaseCubit extends Cubit<DatabaseState> {
             (titleController.text),
             (dateController.text),
             (endTimeController.text),
-            true,
+            false,
             false
           ]);
     }).then((value) {
       debugPrint('Task Data Inserted');
       titleController.clear();
-      getTasksData();
+      getAllTasks();
       debugPrint('${tasks.length}');
       emit(DatabaseTaskCreated());
     });
   }
 
-  void markTaskAsCompleted({required bool isChecked}) {
+  void updateTaskCompletionState({required int id, required int isCompleted}) {
     emit(DatabaseLoading());
-    database.rawUpdate('''
-        UPDATE tasks SET isCompleted = ? WHERE title = ${selectedTask['title']} 
-        '''
-        // , usernameController.text
-        ).then((value) {
-      selectedTask = {};
-      // usernameController.clear();
+    database.rawUpdate('UPDATE tasks SET isCompleted = ? WHERE id = $id',
+        [isCompleted]).then((value) {
       debugPrint('User Data Updated');
-      getTasksData();
+      getAllTasks();
     });
   }
 

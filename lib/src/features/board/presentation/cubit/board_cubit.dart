@@ -9,11 +9,12 @@ class BoardCubit extends Cubit<int> {
 
   static BoardCubit get(context) => BlocProvider.of<BoardCubit>(context);
 
-  bool isCheckboxChecked = false;
+  bool isChecked = false;
 
-  void isChecked() {
-    isCheckboxChecked = !isCheckboxChecked;
-    debugPrint('$isCheckboxChecked');
+  void changeCheckState() {
+    debugPrint('$isChecked');
+    isChecked = !isChecked;
+    debugPrint('$isChecked');
     emit(state + 1);
   }
 }
