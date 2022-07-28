@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:to_do_app/db_cubit.dart';
 import 'package:to_do_app/db_state.dart';
+import 'package:to_do_app/main.dart';
 import 'package:to_do_app/src/config/routes/app_routes.dart';
 import 'package:to_do_app/src/core/utils/app_colors.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
 import 'package:to_do_app/src/core/widgets/my_button_widget.dart';
 import 'package:to_do_app/src/core/widgets/text_field_widget.dart';
+import 'package:to_do_app/src/features/add_task/presentation/widgets/color_picker_widget.dart';
 
 class AddTaskContent extends StatefulWidget {
   const AddTaskContent({Key? key}) : super(key: key);
@@ -29,6 +32,8 @@ class _AddTaskContentState extends State<AddTaskContent> {
   );
 
   String _selectedRepeat = 'None';
+
+  // ignore: prefer_final_fields
   int _selectedColor = 0;
 
   @override
@@ -48,10 +53,12 @@ class _AddTaskContentState extends State<AddTaskContent> {
           lastDate: DateTime(2100));
     }
 
-    Future<TimeOfDay?> _getTimeFromUser() async => await showTimePicker(
-          context: context,
-          initialTime: TimeOfDay(hour: dateTime.hour, minute: dateTime.minute),
-        );
+    Future<TimeOfDay?> _getTimeFromUser() async {
+      return await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay(hour: dateTime.hour, minute: dateTime.minute),
+      );
+    }
 
     void _setDateText() async {
       final date = await _getDateFromUser();
@@ -243,44 +250,14 @@ class _AddTaskContentState extends State<AddTaskContent> {
           ),
           const SizedBox(height: 25),
           // TODO: make reusable component named ColorPickerWidget
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Color',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              Wrap(
-                children: List<Widget>.generate(4, (index) {
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedColor = index),
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: CircleAvatar(
-                        radius: 14,
-                        backgroundColor: index == 0
-                            ? AppColors.tasksColorsList[0]
-                            : index == 1
-                                ? AppColors.tasksColorsList[1]
-                                : index == 2
-                                    ? AppColors.tasksColorsList[2]
-                                    : AppColors.tasksColorsList[3],
-                        child: _selectedColor == index
-                            ? const Icon(Icons.done,
-                                color: Colors.white, size: 16)
-                            : Container(),
-                      ),
-                    ),
-                  );
-                }),
-              )
-            ],
-          ),
+          ColorPickerWidget(selectedColor: _selectedColor),
           SizedBox(height: 53.h),
           // FIXME: due to having a SingleChildScrollView, the Column's MainAxisAlignment.spaceBetween is not effective
           BlocBuilder<DatabaseCubit, DatabaseState>(
             builder: (BuildContext context, state) {
               return MyButtonWidget(
                   onPressed: () {
+                    _scheduleAlarm();
                     DatabaseCubit.get(context).createTask();
                     Navigator.pushNamed(context, Routes.initialRoute);
                   },
@@ -304,5 +281,36 @@ class _AddTaskContentState extends State<AddTaskContent> {
         context: context,
         position: RelativeRect.fromLTRB(offset.dx, offset.dy, 0, 0),
         items: menuItems);
+  }
+
+  // TODO: method is functional but needs to be customize according to task details
+  void _scheduleAlarm() async {
+    var scheduleNotificationDateTime =
+        DateTime.now().add(Duration(seconds: 10));
+
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'alarm_notif', 'alarm_notif',
+        channelDescription: 'Channel for Alarm notification',
+        icon: 'todo_icon',
+        sound: RawResourceAndroidNotificationSound('notification_sound'),
+        largeIcon: DrawableResourceAndroidBitmap('todo_icon'));
+
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails(
+        sound:
+            'notification_sound.mp3', // TODO: convert to wav (mp3 not supported iOS), implement when having MacOS virtual machine or at least Xcode
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true);
+
+    var platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.schedule(
+        0,
+        'Office',
+        'Good morning! Time for office',
+        scheduleNotificationDateTime,
+        platformChannelSpecifics);
   }
 }
