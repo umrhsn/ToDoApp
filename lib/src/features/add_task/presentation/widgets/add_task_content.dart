@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:to_do_app/db_cubit.dart';
 import 'package:to_do_app/db_state.dart';
@@ -258,6 +259,10 @@ class _AddTaskContentState extends State<AddTaskContent> {
               return MyButtonWidget(
                   onPressed: () {
                     _scheduleAlarm();
+                    Fluttertoast.showToast(
+                        msg:
+                            'task "${titleController.text}" is set for ${dateTime.day - DateTime.now().day} days, ${dateTime.hour - DateTime.now().hour} hours and ${dateTime.minute - DateTime.now().minute} minutes from now.',
+                        toastLength: Toast.LENGTH_LONG);
                     DatabaseCubit.get(context).createTask();
                     Navigator.pushNamed(context, Routes.initialRoute);
                   },
@@ -283,10 +288,10 @@ class _AddTaskContentState extends State<AddTaskContent> {
         items: menuItems);
   }
 
-  // TODO: method is functional but needs to be customize according to task details
+  // FIXME: notification now is not shown for some reaseon, and method is only customized to endTimeController.text and needs to consider reminder values
   void _scheduleAlarm() async {
-    var scheduleNotificationDateTime =
-        DateTime.now().add(Duration(seconds: 10));
+    var scheduleNotificationDateTime = DateTime.now().add(Duration(
+        days: dateTime.day, hours: dateTime.hour, minutes: dateTime.minute));
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'alarm_notif', 'alarm_notif',
