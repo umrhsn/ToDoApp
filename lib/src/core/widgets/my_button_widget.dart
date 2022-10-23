@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:to_do_app/src/config/routes/app_routes.dart';
 import 'package:to_do_app/src/core/utils/app_colors.dart';
 import 'package:to_do_app/src/core/utils/media_query_values.dart';
 

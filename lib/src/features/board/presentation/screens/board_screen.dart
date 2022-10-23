@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do_app/db_cubit.dart';
-import 'package:to_do_app/db_state.dart';
 import 'package:to_do_app/src/config/routes/app_routes.dart';
 import 'package:to_do_app/src/core/utils/app_constants.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
@@ -19,7 +18,7 @@ class _BoardScreenState extends State<BoardScreen> {
   Widget _buildBodyContent() {
     return BlocBuilder<DatabaseCubit, DatabaseState>(
       builder: (context, state) {
-        return BoardContent();
+        return const BoardContent();
       },
     );
   }
@@ -31,8 +30,7 @@ class _BoardScreenState extends State<BoardScreen> {
       title: AppStrings.boardScreenTitle,
       hasActions: true,
       trailingIcon: Icons.calendar_month_outlined,
-      trailingIconOnTap: () =>
-          Navigator.pushNamed(context, Routes.scheduleRoute),
+      trailingIconOnTap: () => Navigator.pushNamed(context, Routes.scheduleRoute),
       bottom: const TabBar(tabs: AppConstants.boardTabs, isScrollable: true),
     );
 

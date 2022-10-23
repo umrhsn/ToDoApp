@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+part of 'db_cubit.dart';
 
 abstract class DatabaseState extends Equatable {
   const DatabaseState();

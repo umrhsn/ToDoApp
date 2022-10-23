@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:to_do_app/db_cubit.dart';
-import 'package:to_do_app/db_state.dart';
-import 'package:to_do_app/main.dart';
 import 'package:to_do_app/src/config/routes/app_routes.dart';
-import 'package:to_do_app/src/core/utils/app_colors.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
 import 'package:to_do_app/src/core/widgets/my_button_widget.dart';
 import 'package:to_do_app/src/core/widgets/text_field_widget.dart';
@@ -46,7 +41,7 @@ class _AddTaskContentState extends State<AddTaskContent> {
     final remindController = DatabaseCubit.get(context).remindController;
     final repeatController = DatabaseCubit.get(context).repeatController;
 
-    Future<DateTime?> _getDateFromUser() async {
+    Future<DateTime?> getDateFromUser() async {
       return await showDatePicker(
           context: context,
           initialDate: DateTime.now(),
@@ -54,27 +49,26 @@ class _AddTaskContentState extends State<AddTaskContent> {
           lastDate: DateTime(2100));
     }
 
-    Future<TimeOfDay?> _getTimeFromUser() async {
+    Future<TimeOfDay?> getTimeFromUser() async {
       return await showTimePicker(
         context: context,
         initialTime: TimeOfDay(hour: dateTime.hour, minute: dateTime.minute),
       );
     }
 
-    void _setDateText() async {
-      final date = await _getDateFromUser();
+    void setDateText() async {
+      final date = await getDateFromUser();
 
       if (date == null) return; // pressed cancel
 
       setState(() {
         dateTime = date;
-        dateController.text =
-            '${dateTime.year}-${dateTime.month}-${dateTime.day}';
+        dateController.text = '${dateTime.year}-${dateTime.month}-${dateTime.day}';
       });
     }
 
-    void _setStartTimeText(String hour, String minute) async {
-      final time = await _getTimeFromUser();
+    void setStartTimeText(String hour, String minute) async {
+      final time = await getTimeFromUser();
 
       if (time == null) return; // pressed cancel
 
@@ -92,8 +86,8 @@ class _AddTaskContentState extends State<AddTaskContent> {
       });
     }
 
-    void _setEndTimeText(String hour, String minute) async {
-      final time = await _getTimeFromUser();
+    void setEndTimeText(String hour, String minute) async {
+      final time = await getTimeFromUser();
 
       if (time == null) return; // pressed cancel
 
@@ -198,9 +192,8 @@ class _AddTaskContentState extends State<AddTaskContent> {
                 TextFormFieldWidget(
                   controller: dateController,
                   label: AppStrings.dateTextFieldLabel,
-                  hintText:
-                      '${dateTime.year}-${dateTime.month}-${dateTime.day}',
-                  suffixIconOnTap: _setDateText,
+                  hintText: '${dateTime.year}-${dateTime.month}-${dateTime.day}',
+                  suffixIconOnTap: setDateText,
                   keyboardType: TextInputType.datetime,
                 ),
                 const SizedBox(height: 25),
@@ -213,7 +206,7 @@ class _AddTaskContentState extends State<AddTaskContent> {
                         label: AppStrings.startTimeTextFieldLabel,
                         hintText: '$hour : $minute',
                         suffixIcon: Icons.access_time_rounded,
-                        suffixIconOnTap: () => _setStartTimeText(hour, minute),
+                        suffixIconOnTap: () => setStartTimeText(hour, minute),
                         keyboardType: TextInputType.datetime,
                       ),
                     ),
@@ -224,7 +217,7 @@ class _AddTaskContentState extends State<AddTaskContent> {
                         label: AppStrings.endTimeTextFieldLabel,
                         hintText: '$nextHour : $minute',
                         suffixIcon: Icons.access_time_rounded,
-                        suffixIconOnTap: () => _setEndTimeText(hour, minute),
+                        suffixIconOnTap: () => setEndTimeText(hour, minute),
                         keyboardType: TextInputType.datetime,
                       ),
                     ),
@@ -235,8 +228,8 @@ class _AddTaskContentState extends State<AddTaskContent> {
                   controller: remindController,
                   label: AppStrings.remindTextFieldLabel,
                   hintText: '10 minutes early',
-                  suffixIconOnTapDown: (details) => _showPopupMenuAtPosition(
-                      details, addTaskReminderMenuItems),
+                  suffixIconOnTapDown: (details) =>
+                      _showPopupMenuAtPosition(details, addTaskReminderMenuItems),
                 ),
                 const SizedBox(height: 25),
                 TextFormFieldWidget(
@@ -258,7 +251,7 @@ class _AddTaskContentState extends State<AddTaskContent> {
             builder: (BuildContext context, state) {
               return MyButtonWidget(
                   onPressed: () {
-                    _scheduleAlarm();
+                    // _scheduleAlarm();
                     Fluttertoast.showToast(
                         msg:
                             'task "${titleController.text}" is set for ${dateTime.day - DateTime.now().day} days, ${dateTime.hour - DateTime.now().hour} hours and ${dateTime.minute - DateTime.now().minute} minutes from now.',
@@ -274,48 +267,46 @@ class _AddTaskContentState extends State<AddTaskContent> {
     );
   }
 
-  void _showPopupMenuAtPosition(
-      TapDownDetails details, List<PopupMenuItem> menuItems) {
+  void _showPopupMenuAtPosition(TapDownDetails details, List<PopupMenuItem> menuItems) {
     final position = details.globalPosition;
     _showPopupMenu(context, position, menuItems);
   }
 
-  Future _showPopupMenu(BuildContext context, Offset offset,
-      List<PopupMenuItem> menuItems) async {
+  Future _showPopupMenu(BuildContext context, Offset offset, List<PopupMenuItem> menuItems) async {
     return await showMenu(
         context: context,
         position: RelativeRect.fromLTRB(offset.dx, offset.dy, 0, 0),
         items: menuItems);
   }
 
-  // FIXME: notification now is not shown for some reaseon, and method is only customized to endTimeController.text and needs to consider reminder values
-  void _scheduleAlarm() async {
-    var scheduleNotificationDateTime = DateTime.now().add(Duration(
-        days: dateTime.day, hours: dateTime.hour, minutes: dateTime.minute));
-
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'alarm_notif', 'alarm_notif',
-        channelDescription: 'Channel for Alarm notification',
-        icon: 'todo_icon',
-        sound: RawResourceAndroidNotificationSound('notification_sound'),
-        largeIcon: DrawableResourceAndroidBitmap('todo_icon'));
-
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails(
-        sound:
-            'notification_sound.mp3', // TODO: convert to wav (mp3 not supported iOS), implement when having MacOS virtual machine or at least Xcode
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true);
-
-    var platformChannelSpecifics = NotificationDetails(
-        android: androidPlatformChannelSpecifics,
-        iOS: iOSPlatformChannelSpecifics);
-
-    await flutterLocalNotificationsPlugin.schedule(
-        0,
-        'Office',
-        'Good morning! Time for office',
-        scheduleNotificationDateTime,
-        platformChannelSpecifics);
-  }
+// FIXME: notification now is not shown for some reaseon, and method is only customized to endTimeController.text and needs to consider reminder values
+// void _scheduleAlarm() async {
+//   var scheduleNotificationDateTime = DateTime.now().add(Duration(
+//       days: dateTime.day, hours: dateTime.hour, minutes: dateTime.minute));
+//
+//   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+//       'alarm_notif', 'alarm_notif',
+//       channelDescription: 'Channel for Alarm notification',
+//       icon: 'todo_icon',
+//       sound: RawResourceAndroidNotificationSound('notification_sound'),
+//       largeIcon: DrawableResourceAndroidBitmap('todo_icon'));
+//
+//   var iOSPlatformChannelSpecifics = IOSNotificationDetails(
+//       sound:
+//           'notification_sound.mp3', // TODO: convert to wav (mp3 not supported iOS), implement when having MacOS virtual machine or at least Xcode
+//       presentAlert: true,
+//       presentBadge: true,
+//       presentSound: true);
+//
+//   var platformChannelSpecifics = NotificationDetails(
+//       android: androidPlatformChannelSpecifics,
+//       iOS: iOSPlatformChannelSpecifics);
+//
+//   await flutterLocalNotificationsPlugin.schedule(
+//       0,
+//       'Office',
+//       'Good morning! Time for office',
+//       scheduleNotificationDateTime,
+//       platformChannelSpecifics);
+// }
 }
