@@ -24,10 +24,9 @@ class _BoardItemState extends State<BoardItem> {
   Widget build(BuildContext context) {
     // TODO: AppColors.tasksColorsList.shuffle();
     bool isChecked = BoardCubit.get(context).isChecked;
-    int isCompleted =
-        DatabaseCubit.get(context).tasks[widget.index]['isCompleted'];
+    int isCompleted = DatabaseCubit.get(context).tasks[widget.index]['isCompleted'];
 
-    void _handleClick(String value) {
+    void handleClick(String value) {
       switch (value) {
         case 'Add to Completed':
           break;
@@ -59,7 +58,7 @@ class _BoardItemState extends State<BoardItem> {
         Text(DatabaseCubit.get(context).tasks[widget.index]['title']),
         const Spacer(),
         PopupMenuButton<String>(
-          onSelected: _handleClick,
+          onSelected: handleClick,
           itemBuilder: (context) {
             return AppConstants.boardMenuItems;
           },

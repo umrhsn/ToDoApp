@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:to_do_app/src/core/utils/app_colors.dart';
 
 class CheckboxWidget extends StatefulWidget {
   bool isChecked;

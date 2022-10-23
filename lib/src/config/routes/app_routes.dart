@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
 import 'package:to_do_app/src/features/add_task/presentation/screens/add_task_screen.dart';
 import 'package:to_do_app/src/features/board/presentation/screens/board_screen.dart';

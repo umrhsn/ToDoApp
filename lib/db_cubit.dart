@@ -1,9 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as join;
-import 'package:to_do_app/db_state.dart';
+import 'package:sqflite/sqflite.dart';
+
+part 'db_state.dart';
 
 class DatabaseCubit extends Cubit<DatabaseState> {
   DatabaseCubit() : super(DatabaseInitialized());
@@ -69,9 +70,7 @@ class DatabaseCubit extends Cubit<DatabaseState> {
 
   void getCompletedTasks() async {
     emit(DatabaseLoading());
-    database
-        .rawQuery('SELECT * FROM tasks WHERE isCompleted = TRUE')
-        .then((value) {
+    database.rawQuery('SELECT * FROM tasks WHERE isCompleted = TRUE').then((value) {
       debugPrint('Completed Tasks Data Fetched');
       tasks = value;
       debugPrint(tasks.toString());
@@ -81,9 +80,7 @@ class DatabaseCubit extends Cubit<DatabaseState> {
 
   void getUnCompletedTasks() async {
     emit(DatabaseLoading());
-    database
-        .rawQuery('SELECT * FROM tasks WHERE isCompleted = FALSE')
-        .then((value) {
+    database.rawQuery('SELECT * FROM tasks WHERE isCompleted = FALSE').then((value) {
       debugPrint('Uncompleted Tasks Data Fetched');
       tasks = value;
       debugPrint(tasks.toString());
@@ -93,9 +90,7 @@ class DatabaseCubit extends Cubit<DatabaseState> {
 
   void getFavoriteTasks() async {
     emit(DatabaseLoading());
-    database
-        .rawQuery('SELECT * FROM tasks WHERE isFavorite = TRUE')
-        .then((value) {
+    database.rawQuery('SELECT * FROM tasks WHERE isFavorite = TRUE').then((value) {
       debugPrint('Uncompleted Tasks Data Fetched');
       tasks = value;
       debugPrint(tasks.toString());
@@ -116,13 +111,7 @@ class DatabaseCubit extends Cubit<DatabaseState> {
     database.transaction((txn) async {
       txn.rawInsert(
           'INSERT INTO tasks(title, date, endTime, isCompleted, isFavorite) VALUES(?, ?, ?, ?, ?)',
-          [
-            (titleController.text),
-            (dateController.text),
-            (endTimeController.text),
-            false,
-            false
-          ]);
+          [(titleController.text), (dateController.text), (endTimeController.text), false, false]);
     }).then((value) {
       debugPrint('Task Data Inserted');
       titleController.clear();
@@ -134,8 +123,8 @@ class DatabaseCubit extends Cubit<DatabaseState> {
 
   void updateTaskCompletionState({required int id, required int isCompleted}) {
     emit(DatabaseLoading());
-    database.rawUpdate('UPDATE tasks SET isCompleted = ? WHERE id = $id',
-        [isCompleted]).then((value) {
+    database
+        .rawUpdate('UPDATE tasks SET isCompleted = ? WHERE id = $id', [isCompleted]).then((value) {
       debugPrint('User Data Updated');
       getAllTasks();
     });
