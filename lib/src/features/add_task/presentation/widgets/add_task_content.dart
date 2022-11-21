@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:to_do_app/db_cubit.dart';
 import 'package:to_do_app/db_state.dart';
-import 'package:to_do_app/main.dart';
 import 'package:to_do_app/src/config/routes/app_routes.dart';
-import 'package:to_do_app/src/core/utils/app_colors.dart';
+import 'package:to_do_app/src/core/services/date_time_service.dart';
+import 'package:to_do_app/src/core/services/notification_service.dart';
+import 'package:to_do_app/src/core/services/popup_menu_service.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
 import 'package:to_do_app/src/core/widgets/my_button_widget.dart';
 import 'package:to_do_app/src/core/widgets/text_field_widget.dart';
@@ -24,13 +23,17 @@ class AddTaskContent extends StatefulWidget {
 class _AddTaskContentState extends State<AddTaskContent> {
   final formKey = GlobalKey<FormState>();
 
-  DateTime dateTime = DateTime(
+  DateTime _dateTime = DateTime(
     DateTime.now().year,
     DateTime.now().month,
     DateTime.now().day,
     DateTime.now().hour,
     DateTime.now().minute,
   );
+
+  DateTime? _startTime;
+  DateTime? _endTime;
+  Duration? _timeDifference;
 
   String _selectedRepeat = 'None';
 
@@ -45,71 +48,6 @@ class _AddTaskContentState extends State<AddTaskContent> {
     final endTimeController = DatabaseCubit.get(context).endTimeController;
     final remindController = DatabaseCubit.get(context).remindController;
     final repeatController = DatabaseCubit.get(context).repeatController;
-
-    Future<DateTime?> _getDateFromUser() async {
-      return await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime.now(),
-          lastDate: DateTime(2100));
-    }
-
-    Future<TimeOfDay?> _getTimeFromUser() async {
-      return await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay(hour: dateTime.hour, minute: dateTime.minute),
-      );
-    }
-
-    void _setDateText() async {
-      final date = await _getDateFromUser();
-
-      if (date == null) return; // pressed cancel
-
-      setState(() {
-        dateTime = date;
-        dateController.text =
-            '${dateTime.year}-${dateTime.month}-${dateTime.day}';
-      });
-    }
-
-    void _setStartTimeText(String hour, String minute) async {
-      final time = await _getTimeFromUser();
-
-      if (time == null) return; // pressed cancel
-
-      final newDateTime = DateTime(
-        dateTime.year,
-        dateTime.month,
-        dateTime.day,
-        time.hour,
-        time.minute,
-      );
-
-      setState(() {
-        dateTime = newDateTime;
-        startTimeController.text = '$hour : $minute';
-      });
-    }
-
-    void _setEndTimeText(String hour, String minute) async {
-      final time = await _getTimeFromUser();
-
-      if (time == null) return; // pressed cancel
-
-      final newDateTime = DateTime(
-        dateTime.year,
-        dateTime.month,
-        dateTime.day,
-        time.hour,
-        time.minute,
-      );
-
-      setState(() {
-        dateTime = newDateTime;
-        endTimeController.text = '$hour : $minute';
-      });
-    }
 
     List<PopupMenuItem> addTaskReminderMenuItems = [
       PopupMenuItem(
@@ -173,10 +111,10 @@ class _AddTaskContentState extends State<AddTaskContent> {
       ),
     ];
 
-    int nextH = dateTime.hour + 1;
-    final String hour = dateTime.hour.toString().padLeft(2, '0');
+    int nextH = _dateTime.hour == 23 ? 0 : _dateTime.hour + 1;
+    final String hour = _dateTime.hour.toString().padLeft(2, '0');
     final String nextHour = nextH.toString().padLeft(2, '0');
-    final String minute = dateTime.minute.toString().padLeft(2, '0');
+    final String minute = _dateTime.minute.toString().padLeft(2, '0');
 
     return SingleChildScrollView(
       child: Column(
@@ -187,135 +125,156 @@ class _AddTaskContentState extends State<AddTaskContent> {
             key: formKey,
             child: Column(
               children: [
-                TextFormFieldWidget(
-                  readOnly: false,
-                  controller: titleController,
-                  label: AppStrings.titleTextFieldLabel,
-                  hintText: 'Design team meeting',
-                  suffixIcon: null,
-                ),
+                buildTitleField(titleController),
                 const SizedBox(height: 25),
-                TextFormFieldWidget(
-                  controller: dateController,
-                  label: AppStrings.dateTextFieldLabel,
-                  hintText:
-                      '${dateTime.year}-${dateTime.month}-${dateTime.day}',
-                  suffixIconOnTap: _setDateText,
-                  keyboardType: TextInputType.datetime,
-                ),
+                buildDateField(dateController, context),
                 const SizedBox(height: 25),
                 Row(
-                  // FIXME: time must be set twice in both textFields to be seen as text.
                   children: [
-                    Expanded(
-                      child: TextFormFieldWidget(
-                        controller: startTimeController,
-                        label: AppStrings.startTimeTextFieldLabel,
-                        hintText: '$hour : $minute',
-                        suffixIcon: Icons.access_time_rounded,
-                        suffixIconOnTap: () => _setStartTimeText(hour, minute),
-                        keyboardType: TextInputType.datetime,
-                      ),
-                    ),
+                    buildStartTimeField(
+                        startTimeController, hour, minute, context),
                     const SizedBox(width: 20),
-                    Expanded(
-                      child: TextFormFieldWidget(
-                        controller: endTimeController,
-                        label: AppStrings.endTimeTextFieldLabel,
-                        hintText: '$nextHour : $minute',
-                        suffixIcon: Icons.access_time_rounded,
-                        suffixIconOnTap: () => _setEndTimeText(hour, minute),
-                        keyboardType: TextInputType.datetime,
-                      ),
-                    ),
+                    buildEndTimeField(
+                        endTimeController, nextHour, minute, context, hour),
                   ],
                 ),
                 const SizedBox(height: 25),
-                TextFormFieldWidget(
-                  controller: remindController,
-                  label: AppStrings.remindTextFieldLabel,
-                  hintText: '10 minutes early',
-                  suffixIconOnTapDown: (details) => _showPopupMenuAtPosition(
-                      details, addTaskReminderMenuItems),
-                ),
+                buildReminderField(
+                    remindController, context, addTaskReminderMenuItems),
                 const SizedBox(height: 25),
-                TextFormFieldWidget(
-                  controller: repeatController,
-                  label: AppStrings.repeatTextFieldLabel,
-                  hintText: 'Weekly',
-                  suffixIconOnTapDown: (details) =>
-                      _showPopupMenuAtPosition(details, addTaskRepeatMenuItems),
-                ),
+                buildRepeatField(
+                    repeatController, context, addTaskRepeatMenuItems),
               ],
             ),
           ),
           const SizedBox(height: 25),
-          // TODO: make reusable component named ColorPickerWidget
           ColorPickerWidget(selectedColor: _selectedColor),
           SizedBox(height: 53.h),
           // FIXME: due to having a SingleChildScrollView, the Column's MainAxisAlignment.spaceBetween is not effective
-          BlocBuilder<DatabaseCubit, DatabaseState>(
-            builder: (BuildContext context, state) {
-              return MyButtonWidget(
-                  onPressed: () {
-                    _scheduleAlarm();
-                    Fluttertoast.showToast(
-                        msg:
-                            'task "${titleController.text}" is set for ${dateTime.day - DateTime.now().day} days, ${dateTime.hour - DateTime.now().hour} hours and ${dateTime.minute - DateTime.now().minute} minutes from now.',
-                        toastLength: Toast.LENGTH_LONG);
-                    DatabaseCubit.get(context).createTask();
-                    Navigator.pushNamed(context, Routes.initialRoute);
-                  },
-                  label: AppStrings.createTaskButtonLabel);
-            },
-          ),
+          buildButton(titleController),
         ],
       ),
     );
   }
 
-  void _showPopupMenuAtPosition(
-      TapDownDetails details, List<PopupMenuItem> menuItems) {
-    final position = details.globalPosition;
-    _showPopupMenu(context, position, menuItems);
+  BlocBuilder<DatabaseCubit, DatabaseState> buildButton(
+      TextEditingController titleController) {
+    return BlocBuilder<DatabaseCubit, DatabaseState>(
+      builder: (BuildContext context, state) {
+        return MyButtonWidget(
+            onPressed: () {
+              NotificationService(_dateTime).scheduleAlarm();
+              Fluttertoast.showToast(
+                  msg:
+                      // FIXME: need a better logic for calculating time difference, and making endTime and startTime listen to day value which they don't
+                      'task "${titleController.text}" is set for ${_endTime!.difference(_startTime!).inDays} days, ${_endTime!.difference(_startTime!).inHours} hours and ${_endTime!.difference(_startTime!).inMinutes} minutes from now.',
+                  toastLength: Toast.LENGTH_LONG);
+              DatabaseCubit.get(context).createTask();
+              Navigator.pushNamed(context, Routes.initialRoute);
+            },
+            label: AppStrings.createTaskButtonLabel);
+      },
+    );
   }
 
-  Future _showPopupMenu(BuildContext context, Offset offset,
-      List<PopupMenuItem> menuItems) async {
-    return await showMenu(
-        context: context,
-        position: RelativeRect.fromLTRB(offset.dx, offset.dy, 0, 0),
-        items: menuItems);
+  TextFieldWidget buildRepeatField(
+      TextEditingController repeatController,
+      BuildContext context,
+      List<PopupMenuItem<dynamic>> addTaskRepeatMenuItems) {
+    return TextFieldWidget(
+      controller: repeatController,
+      label: AppStrings.repeatTextFieldLabel,
+      hintText: 'Weekly',
+      suffixIconOnTapDown: (details) => PopupMenuService(context)
+          .showPopupMenuAtPosition(details, addTaskRepeatMenuItems),
+    );
   }
 
-  // FIXME: notification now is not shown for some reaseon, and method is only customized to endTimeController.text and needs to consider reminder values
-  void _scheduleAlarm() async {
-    var scheduleNotificationDateTime = DateTime.now().add(Duration(
-        days: dateTime.day, hours: dateTime.hour, minutes: dateTime.minute));
+  TextFieldWidget buildReminderField(
+      TextEditingController remindController,
+      BuildContext context,
+      List<PopupMenuItem<dynamic>> addTaskReminderMenuItems) {
+    return TextFieldWidget(
+      controller: remindController,
+      label: AppStrings.remindTextFieldLabel,
+      hintText: '10 minutes early',
+      suffixIconOnTapDown: (details) => PopupMenuService(context)
+          .showPopupMenuAtPosition(details, addTaskReminderMenuItems),
+    );
+  }
 
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'alarm_notif', 'alarm_notif',
-        channelDescription: 'Channel for Alarm notification',
-        icon: 'todo_icon',
-        sound: RawResourceAndroidNotificationSound('notification_sound'),
-        largeIcon: DrawableResourceAndroidBitmap('todo_icon'));
+  Expanded buildEndTimeField(TextEditingController endTimeController,
+      String nextHour, String minute, BuildContext context, String hour) {
+    return Expanded(
+      child: TextFieldWidget(
+        controller: endTimeController,
+        label: AppStrings.endTimeTextFieldLabel,
+        hintText: '$nextHour : $minute',
+        suffixIcon: Icons.access_time_rounded,
+        // FIXME: An endTime with a -ve time difference from startTime shouldn't be accepted
+        onTap: () async {
+          _endTime = await DateTimeService(dateTime: _dateTime).setTimeText(
+              context,
+              controller: endTimeController,
+              hour: hour,
+              minute: minute);
+          setState(() {
+            _dateTime = _endTime ?? _dateTime;
+            _timeDifference = _endTime!.difference(_startTime!);
+          });
+          debugPrint('endTime = $_endTime}');
+          debugPrint(
+              '_timeDifference.isNegative = ${_timeDifference!.isNegative}');
+        },
+        keyboardType: TextInputType.datetime,
+      ),
+    );
+  }
 
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails(
-        sound:
-            'notification_sound.mp3', // TODO: convert to wav (mp3 not supported iOS), implement when having MacOS virtual machine or at least Xcode
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true);
+  Expanded buildStartTimeField(TextEditingController startTimeController,
+      String hour, String minute, BuildContext context) {
+    return Expanded(
+      child: TextFieldWidget(
+        controller: startTimeController,
+        label: AppStrings.startTimeTextFieldLabel,
+        hintText: '$hour : $minute',
+        suffixIcon: Icons.access_time_rounded,
+        onTap: () async {
+          _startTime = await DateTimeService(dateTime: _dateTime).setTimeText(
+              context,
+              controller: startTimeController,
+              hour: hour,
+              minute: minute);
+          setState(() => _dateTime = _startTime ?? _dateTime);
+          debugPrint('startTime = $_startTime}');
+        },
+        keyboardType: TextInputType.datetime,
+      ),
+    );
+  }
 
-    var platformChannelSpecifics = NotificationDetails(
-        android: androidPlatformChannelSpecifics,
-        iOS: iOSPlatformChannelSpecifics);
+  TextFieldWidget buildDateField(
+      TextEditingController dateController, BuildContext context) {
+    return TextFieldWidget(
+      controller: dateController,
+      label: AppStrings.dateTextFieldLabel,
+      hintText: '${_dateTime.year}-${_dateTime.month}-${_dateTime.day}',
+      onTap: () async {
+        var newDate = await DateTimeService(dateTime: _dateTime)
+            .setDateText(context, dateController);
+        setState(() => _dateTime = newDate ?? _dateTime);
+      },
+      keyboardType: TextInputType.datetime,
+    );
+  }
 
-    await flutterLocalNotificationsPlugin.schedule(
-        0,
-        'Office',
-        'Good morning! Time for office',
-        scheduleNotificationDateTime,
-        platformChannelSpecifics);
+  TextFieldWidget buildTitleField(TextEditingController titleController) {
+    return TextFieldWidget(
+      readOnly: false,
+      controller: titleController,
+      label: AppStrings.titleTextFieldLabel,
+      hintText: 'Design team meeting',
+      suffixIcon: null,
+    );
   }
 }

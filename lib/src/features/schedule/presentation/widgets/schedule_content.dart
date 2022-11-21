@@ -36,8 +36,8 @@ class _ScheduleContentState extends State<ScheduleContent> {
           ),
         ),
         Padding(
-            padding: EdgeInsets.only(bottom: 20, right: 20, left: 20, top: 8),
-            child: Wrap(children: List.generate(4, (index) => ScheduleItem()))),
+            padding: const EdgeInsets.only(bottom: 20, right: 20, left: 20, top: 8),
+            child: Wrap(children: List.generate(4, (index) => const ScheduleItem()))),
       ],
     );
   }
