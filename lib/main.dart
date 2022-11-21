@@ -8,7 +8,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var initializationSettingsAndroid =
-      AndroidInitializationSettings('todo_icon');
+      const AndroidInitializationSettings('todo_icon');
   var initializationSettingsIOS = IOSInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -18,7 +18,7 @@ void main() async {
       android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
   await flutterLocalNotificationsPlugin.initialize(initializationSettings,
       onSelectNotification: (payload) async {
-    if (payload != null) debugPrint('notification payload: ' + payload);
+    if (payload != null) debugPrint('notification payload: $payload');
   });
   runApp(const ToDoApp());
 }

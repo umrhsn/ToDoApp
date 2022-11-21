@@ -16,10 +16,10 @@ class AddTaskScreen extends StatefulWidget {
 class _AddTaskScreenState extends State<AddTaskScreen> {
   Widget _buildBodyContent() {
     return Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: BlocBuilder<DatabaseCubit, DatabaseState>(
           builder: (context, state) {
-            return AddTaskContent();
+            return const AddTaskContent();
           },
         ));
   }

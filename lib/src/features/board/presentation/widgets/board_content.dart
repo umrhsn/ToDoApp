@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do_app/db_cubit.dart';
-import 'package:to_do_app/db_state.dart';
 import 'package:to_do_app/src/config/routes/app_routes.dart';
 import 'package:to_do_app/src/core/utils/app_constants.dart';
 import 'package:to_do_app/src/core/utils/app_strings.dart';
 import 'package:to_do_app/src/core/widgets/my_button_widget.dart';
 
 class BoardContent extends StatefulWidget {
-  BoardContent({Key? key}) : super(key: key);
+  const BoardContent({Key? key}) : super(key: key);
 
   @override
   State<BoardContent> createState() => _BoardContentState();

@@ -1,31 +1,36 @@
 import 'package:flutter/material.dart';
 
-class TextFormFieldWidget extends StatelessWidget {
+class TextFieldWidget extends StatelessWidget {
   final TextEditingController controller;
+  final String label;
+  final String hintText;
   final bool readOnly;
   final FocusNode? focusNode;
   final TextInputAction textInputAction;
   final TextInputType keyboardType;
-  final String label;
-  final String hintText;
   final IconData? suffixIcon;
-  void Function()? suffixIconOnTap;
-  void Function(TapDownDetails)? suffixIconOnTapDown;
+  final void Function()? onTap;
+  final void Function(TapDownDetails)? suffixIconOnTapDown;
   final void Function()? onEditingComplete;
+  final void Function(String)? onFieldSubmitted;
+  final String? Function(String?)? validator;
 
-  TextFormFieldWidget({
+
+  const TextFieldWidget({
     Key? key,
-    this.readOnly = true,
     required this.controller,
     required this.label,
     required this.hintText,
-    this.suffixIcon = Icons.keyboard_arrow_down_rounded,
-    this.suffixIconOnTap,
-    this.suffixIconOnTapDown,
+    this.readOnly = true,
     this.focusNode,
-    this.keyboardType = TextInputType.text,
-    this.onEditingComplete,
     this.textInputAction = TextInputAction.next,
+    this.keyboardType = TextInputType.text,
+    this.suffixIcon = Icons.keyboard_arrow_down_rounded,
+    this.onTap,
+    this.suffixIconOnTapDown,
+    this.onEditingComplete,
+    this.onFieldSubmitted,
+    this.validator,
   }) : super(key: key);
 
   @override
@@ -48,9 +53,14 @@ class TextFormFieldWidget extends StatelessWidget {
               hintText: hintText,
               suffixIcon: GestureDetector(
                   onTapDown: suffixIconOnTapDown,
-                  onTap: suffixIconOnTap,
-                  child: Icon(suffixIcon))),
+                  child: Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Icon(suffixIcon),
+                  ))),
           onEditingComplete: onEditingComplete,
+          onTap: onTap,
+          validator: validator,
+          onFieldSubmitted: onFieldSubmitted,
         ),
       ],
     );
